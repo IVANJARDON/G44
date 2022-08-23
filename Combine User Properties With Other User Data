@@ -1,0 +1,16 @@
+select
+    user_pseudo_id,
+    timestamp_micros(user_first_touch_timestamp) as user_first_touch_timestamp,
+    traffic_source.medium,
+    max((select value.string_value from unnest(user_properties) where key = 'visitor_status')) as visitor_status,
+    max((select value.string_value from unnest(user_properties) where key = 'custom_client_id')) as custom_client_id,
+    max((select value.string_value from unnest(user_properties) where key = 'loyalty_level')) as loyalty_level,
+    countif(event_name = 'session_start') as number_of_sessions
+from
+    `simoahava-com.analytics_206575074.events_20210601`
+group by 
+    user_pseudo_id,
+    user_first_touch_timestamp,
+    medium
+order by
+    number_of_sessions desc
