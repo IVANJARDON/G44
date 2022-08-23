@@ -1,0 +1,13 @@
+select
+    user_pseudo_id,
+    key,
+    value.string_value
+from
+    `simoahava-com.analytics_206575074.events_20210601`
+    cross join unnest(user_properties)
+where 
+    user_pseudo_id = '1467032112.1598377364'
+group by 
+    user_pseudo_id,
+    key,
+    value.string_value
