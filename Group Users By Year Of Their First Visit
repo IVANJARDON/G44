@@ -1,0 +1,11 @@
+select
+    extract(year from timestamp_micros(user_first_touch_timestamp)) as year_first_touch,
+    count(distinct user_pseudo_id) as users
+from
+    `simoahava-com.analytics_206575074.events_20210601`
+group by 
+    year_first_touch
+having 
+    year_first_touch is not null
+order by
+    year_first_touch desc
