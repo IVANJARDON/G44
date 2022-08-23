@@ -1,0 +1,12 @@
+select
+    event_date as date,
+    count(event_name) as sessions
+from
+    `simoahava-com.analytics_206575074.events_*`
+where
+    regexp_extract(_table_suffix, '[0-9]+') between '20210501' and format_date('%Y%m%d', current_date())
+    and event_name = 'session_start'
+group by 
+    date
+order by
+    date desc
