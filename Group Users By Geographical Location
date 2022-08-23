@@ -1,0 +1,13 @@
+select
+    geo.continent,
+    geo.country,
+    nullif(geo.city,'') as city,
+    count(distinct user_pseudo_id) as users
+from
+    `simoahava-com.analytics_206575074.events_20210601`
+group by 
+    continent,
+    country,
+    city
+order by 
+    users desc
