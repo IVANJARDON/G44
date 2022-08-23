@@ -1,0 +1,13 @@
+select
+    traffic_source.source,
+    traffic_source.medium,
+    traffic_source.name as campaign,
+    count(distinct user_pseudo_id) as users
+from
+    `simoahava-com.analytics_206575074.events_20210601`
+group by 
+    source,
+    medium,
+    campaign
+order by
+    users desc
