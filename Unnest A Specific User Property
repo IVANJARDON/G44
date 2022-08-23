@@ -1,0 +1,11 @@
+select
+    user_pseudo_id,
+    value.string_value as visitor_status
+from
+    `simoahava-com.analytics_206575074.events_20210601`,
+    unnest(user_properties)
+where 
+    key = 'visitor_status'
+group by 
+    user_pseudo_id,
+    value.string_value
