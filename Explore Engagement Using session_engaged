@@ -1,3 +1,4 @@
+with prep as (
 select
     user_pseudo_id,
     (select value.int_value from unnest(event_params) where key = 'ga_session_id') as session_id,
@@ -6,4 +7,10 @@ from
     `simoahava-com.analytics_206575074.events_20210601`
 group by 
     user_pseudo_id,
-    session_id
+    session_id)
+
+select 
+    count(distinct concat(user_pseudo_id,session_id)) as sessions,
+    count(distinct case when session_engaged = '1' then concat(user_pseudo_id,session_id) else null end) as engaged_sessions
+from 
+    prep
