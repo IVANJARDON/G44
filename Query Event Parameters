@@ -1,0 +1,9 @@
+select
+    user_pseudo_id,
+    event_date,
+    event_name,
+    event_params
+from 
+    `simoahava-com.analytics_206575074.events_20210601`
+where 
+    event_name = 'session_start'
