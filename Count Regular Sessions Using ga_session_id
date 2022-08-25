@@ -1,0 +1,5 @@
+select
+    count(distinct (select value.int_value from unnest(event_params) where key = 'ga_session_id')) as sessions_only_session_id,
+    count(distinct concat(user_pseudo_id,(select value.int_value from unnest(event_params) where key = 'ga_session_id'))) as sessions_session_and_user_id
+from 
+    `simoahava-com.analytics_206575074
