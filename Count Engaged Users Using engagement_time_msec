@@ -1,3 +1,6 @@
+--We’re adding the concept of an engaged user into the mix. In this context, 
+--the definition is “any user in the given date range who at any point had an engagement_time_msec of greater than 0
+
 with prep as (
 select
     user_pseudo_id,
