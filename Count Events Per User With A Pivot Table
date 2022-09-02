@@ -1,0 +1,21 @@
+select
+    *
+from (
+    select
+        user_pseudo_id,
+        event_name
+    from
+        `simoahava-com.analytics_206575074.events_202106*`)
+pivot (
+    count(*)
+    for
+        event_name
+    in (
+        'session_start', 
+        'first_visit',
+        'page_view',
+        'scroll',
+        'click',
+        'view_search_results',
+        'file_download', 
+        'video_start'))
