@@ -1,0 +1,22 @@
+with prep as (
+select
+    user_pseudo_id,
+    (select value.int_value from unnest(event_params) where key = 'ga_session_id') as session_id,
+    (select value.string_value from unnest(event_params) where key = 'page_location') as page,
+    case when (select value.int_value from unnest(event_params) where key = 'entrances') = 1 then true else false end as landing_page
+from
+    `simoahava-com.analytics_206575074.events_20210601`
+where
+    event_name = 'page_view')
+
+select 
+    case when landing_page is true then page else null end as landing_page,
+    count(distinct concat(user_pseudo_id,session_id)) as entrances
+from 
+    prep
+group by 
+    landing_page
+having 
+    landing_page is not null
+order by
+    entrances desc
