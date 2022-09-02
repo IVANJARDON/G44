@@ -1,0 +1,36 @@
+with prep as (
+select
+    user_pseudo_id,
+    (select value.int_value from unnest(event_params) where event_name = 'page_view' and key = 'ga_session_id') as session_id,
+    (select value.string_value from unnest(event_params) where event_name = 'page_view' and key = 'page_location') as page,
+    event_timestamp
+from
+    `simoahava-com.analytics_206575074.events_20210601`
+where
+    event_name = 'page_view'
+order by 
+    event_timestamp),
+
+prep_exit as (
+select 
+    user_pseudo_id,
+    session_id,
+    page,
+    event_timestamp,
+    first_value(page) over (partition by user_pseudo_id,session_id order by event_timestamp desc) as exit_page
+from 
+    prep 
+order by 
+    event_timestamp)
+
+select
+    case when page = exit_page then page else null end as exit_page,
+    count(distinct concat(user_pseudo_id,session_id)) as exits
+from 
+    prep_exit
+group by 
+    exit_page
+having 
+    exit_page is not null 
+order by 
+    exits desc
