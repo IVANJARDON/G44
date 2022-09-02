@@ -1,0 +1,23 @@
+with prep as (
+select
+    user_pseudo_id,
+    (select value.int_value from unnest(event_params) where event_name = 'page_view' and key = 'ga_session_id') as session_id,
+    (select value.string_value from unnest(event_params) where event_name = 'page_view' and key = 'page_title') as page_title,
+    (select value.string_value from unnest(event_params) where event_name = 'page_view' and key = 'page_location') as page
+from
+    `simoahava-com.analytics_206575074.events_20210601`
+where
+    event_name = 'page_view')
+
+select 
+    page_title,
+    page,
+    count(*) as total_pageviews,
+    count(distinct concat(user_pseudo_id,session_id)) as unique_pageviews
+from 
+    prep
+group by 
+    page_title,
+    page
+order by
+    unique_pageviews desc
