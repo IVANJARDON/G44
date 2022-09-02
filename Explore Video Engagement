@@ -1,0 +1,17 @@
+select 
+    (select value.string_value from unnest(event_params) where event_name like 'video%' and key = 'video_provider') as video_provider,
+    (select value.string_value from unnest(event_params) where event_name like 'video%' and key = 'video_title') as video_title,
+    (select value.string_value from unnest(event_params) where event_name like 'video%' and key = 'video_url') as video_url,
+    (select value.int_value from unnest(event_params) where event_name like 'video%' and key = 'video_duration') as video_duration,
+    countif(event_name = 'video_start') as video_start,
+    countif(event_name = 'video_progress' and (select value.int_value from unnest(event_params) where event_name = 'video_progress' and key = 'video_percent') = 50) as video_progress_50_percent,
+    countif(event_name = 'video_complete') as video_complete
+from 
+    `simoahava-com.analytics_206575074.events_20210601`
+group by 
+    video_provider,
+    video_title,
+    video_url,
+    video_duration
+order by 
+    video_start desc
