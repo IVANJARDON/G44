@@ -1,0 +1,39 @@
+with prep as (
+select
+    user_pseudo_id,
+    (select value.int_value from unnest(event_params) where event_name = 'page_view' and key = 'ga_session_id') as session_id,
+    (select value.string_value from unnest(event_params) where event_name = 'page_view' and key = 'page_location') as page,
+    event_timestamp
+from
+    `simoahava-com.analytics_206575074.events_20210601`
+where
+    event_name = 'page_view'),
+
+prep_navigation as (
+select
+    user_pseudo_id,
+    session_id,
+    lag(page,1) over (partition by user_pseudo_id,session_id order by event_timestamp asc) as previous_page,
+    page,
+    lead(page,1) over (partition by user_pseudo_id,session_id order by event_timestamp asc) as next_page,
+    event_timestamp
+from 
+    prep)
+
+select 
+    ifnull(previous_page,'(entrance)') as previous_page,
+    page,
+    ifnull(next_page,'(exit)') as next_page,
+    count(distinct concat(user_pseudo_id, session_id)) as count
+from 
+    prep_navigation
+where 
+    page = 'https://www.simoahava.com/analytics/enhanced-ecommerce-guide-for-google-tag-manager/'
+group by 
+    previous_page,
+    page,
+    next_page
+having 
+    page not in (previous_page,next_page)
+order by 
+    count desc
