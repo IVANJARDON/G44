@@ -1,0 +1,13 @@
+select
+    user_pseudo_id,
+    sum(ecommerce.purchase_revenue) as lifetime_value
+from
+    `simoahava-com.analytics_206575074.events_*`
+where
+    _table_suffix between format_date('%Y%m%d',date_sub(current_date(), interval 60 day))
+    and format_date('%Y%m%d',date_sub(current_date(), interval 1 day))
+    and ecommerce.purchase_revenue is not null
+group by 
+    user_pseudo_id
+order by 
+    lifetime_value desc
