@@ -1,0 +1,8 @@
+select 
+    sum(items.quantity) as items,
+    sum(items.item_revenue) as item_revenue
+from 
+    `simoahava-com.analytics_206575074.events_20210701`,
+    unnest(items) as items
+where 
+    event_name = 'purchase'
