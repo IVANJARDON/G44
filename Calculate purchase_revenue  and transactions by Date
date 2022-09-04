@@ -1,0 +1,12 @@
+select 
+    event_date as date,
+    count(distinct ecommerce.transaction_id) as transactions,
+    sum(ecommerce.purchase_revenue) as purchase_revenue
+from
+    `simoahava-com.analytics_206575074.events_*`
+where
+    _table_suffix between '20210701' and format_date('%Y%m%d',date_sub(current_date(), interval 1 day))
+group by 
+    date
+order by
+    date
