@@ -1,0 +1,33 @@
+with prep as (
+select
+    user_pseudo_id,
+    (select value.int_value from unnest(event_params) where key = 'ga_session_id') as session_id,
+    (select value.int_value from unnest(event_params) where key = 'ga_session_number') as session_number,
+    max((select value.int_value from unnest(event_params) where key = 'engagement_time_msec')) as engagement_time_msec,
+    parse_date('%Y%m%d',event_date) as session_date,
+    first_value(parse_date('%Y%m%d',event_date)) over (partition by user_pseudo_id order by event_date) as first_session_date
+from
+    `simoahava-com.analytics_206575074.events_*`
+where
+    _table_suffix between format_date('%Y%m%d',date_sub(current_date(), interval 43 day)) and format_date('%Y%m%d',date_sub(current_date(), interval 1 day))
+group by
+    user_pseudo_id,
+    session_id,
+    session_number,
+    event_date
+order by
+    user_pseudo_id,
+    session_id,
+    session_number)
+
+select 
+    date_diff(session_date,first_session_date,day) as day,
+    count(distinct case when session_number = 1 and engagement_time_msec > 0 then user_pseudo_id else null end) as new_users,
+    count(distinct case when session_number > 1 and engagement_time_msec > 0 then user_pseudo_id else null end) as returning_users,
+    count(distinct case when session_number > 1 and engagement_time_msec > 0 then user_pseudo_id else null end) / max(count(distinct case when session_number = 1 and engagement_time_msec > 0 then user_pseudo_id else null end)) over () as retention_percentage
+from 
+    prep
+group by 
+    day
+order by 
+    day
