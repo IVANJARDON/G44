@@ -1,0 +1,6 @@
+select 
+    event_name,
+    items
+from 
+    `simoahava-com.analytics_206575074.events_20210701`,
+    unnest(items) as items
